@@ -17,17 +17,15 @@ library(dplyr)
 
 message("--Retrieve Feature Data")
 features <- read.table(UCI_HAR_FEATURES)
-#Get the column indices that we want to keep
-message("--Search for Column Names that have Mean or Std in them")
-colNum <- grep("mean|std", features$V2)
-#Get the names of the columns
-colNam <- grep("mean|std", features$V2, value = TRUE)
-#clean the column names
-#convert to all lower case
+colNam <- features$V2
 colNam <- tolower(colNam)
 message("--Removing unneeded Characters from Column Names")
 #remove the () from the names
 colNam <- gsub('\\(|\\)', '', colNam)
+
+#Get the column indices that we want to keep
+message("--Search for Column Names that have Mean or Std in them")
+colNum <- grep("mean|std", features$V2)
 
 
 # Reads the features file, locates the column indicies that contain mean and std.
@@ -36,15 +34,13 @@ colNam <- gsub('\\(|\\)', '', colNam)
 tidyHARData <- function(data) {
     message("----Subsetting Data Frame to Remove Columns that Don't Deal with Mean or Std")
     newData <- data[,colNum]
-    message("----Applying New Column Names")
-    names(newData) <-colNam
     return(newData)
 }
 
 createDataSet <- function(x_data_path, y_data_path, subject_data_path) {
     #this will create a dataframe with 561 columns - this is the actual data
     #defer renaming column names until after the merge
-    XData <- read.table(x_data_path)
+    XData <- read.table(x_data_path, numerals = "no.loss", col.names = colNam)
     XData <- tidyHARData(XData)
     
     #This will create a dataframe of 1 column - this is activity

@@ -1,5 +1,7 @@
 UCI_HAR_DATASET_PATH <- 'UCI_HAR_Dataset'
 UCI_HAR_FEATURES <- paste(UCI_HAR_DATASET_PATH,"/features.txt",sep = "")
+UCI_HAR_ACTIVITY_LABELS <- paste(UCI_HAR_DATASET_PATH,"/activity_labels.txt",
+                                 sep = "")
 
 TRAIN_DATA_PATH <- 'UCI_HAR_Dataset/train'
 XTRAIN_DATA_PATH <- paste(TRAIN_DATA_PATH,"/X_train.txt",sep = "")
@@ -13,23 +15,25 @@ SUBJECTTEST_DATA_PATH <- paste(TEST_DATA_PATH,"/subject_test.txt",sep = "")
 
 library(dplyr)
 
+message("--Retrieve Feature Data")
+features <- read.table(UCI_HAR_FEATURES)
+#Get the column indices that we want to keep
+message("--Search for Column Names that have Mean or Std in them")
+colNum <- grep("mean|std", features$V2)
+#Get the names of the columns
+colNam <- grep("mean|std", features$V2, value = TRUE)
+#clean the column names
+#convert to all lower case
+colNam <- tolower(colNam)
+message("--Removing unneeded Characters from Column Names")
+#remove the () from the names
+colNam <- gsub('\\(|\\)', '', colNam)
+
+
 # Reads the features file, locates the column indicies that contain mean and std.
 # Then taking that information, subsets the data to contain only those indicies 
 # and then renames the columns to the tidied version produced here.
 tidyHARData <- function(data) {
-    message("--Retrieve Feature Data")
-    features <- read.table(UCI_HAR_FEATURES)
-    #Get the column indices that we want to keep
-    message("--Search for Column Names that have Mean or Std in them")
-    colNum <- grep("mean|std", features$V2)
-    #Get the names of the columns
-    colNam <- grep("mean|std", features$V2, value = TRUE)
-    #clean the column names
-    #convert to all lower case
-    colNam <- tolower(colNam)
-    message("--Removing unneeded Characters from Column Names")
-    #remove the () from the names
-    colNam <- gsub('\\(|\\)', '', colNam)
     message("--Subsetting Data Frame to Remove Columns that Don't Deal with Mean or Std")
     newData <- data[,colNum]
     message("--Applying New Column Names")
@@ -93,19 +97,16 @@ createHARDataSet <- function(test, train) {
 #This will change the numeric values to their string equivalents
 mutateActivityLabels <- function(harDataSet) {
     message("-Applying Activity Labels to Activity Column")
+    al <- read.table(UCI_HAR_ACTIVITY_LABELS)
     return(mutate(harDataSet, 
-           Activity = factor(Activity, 
-                             labels = c("WALKING", 
-                                        "WALKING_UPSTAIRS", 
-                                        "WALKING_DOWNSTAIRS", 
-                                        "SITTING", 
-                                        "STANDING", 
-                                        "LAYING"))))
+                  Activity = factor(Activity, 
+                                    labels = al$V2)))
 }
 
 #Take the resulting data set, order it by participant and then write the data 
 #frame out to a CSV file.
 presentToTheWorld <- function(theDataSet, fileName) {
+    message(paste("-Creating CSV file", fileName))
     sortedData <- arrange(theDataSet,
                           as.numeric(as.character(theDataSet$Participant)))
     write.csv(sortedData, file = fileName, row.names = FALSE)
@@ -121,6 +122,7 @@ run_analysis <- function() {
         testDF <- createTestDataSet()
         trainDF <- createTrainingDataSet()
         
+        #Do the column widths of the data frames match?
         if (ncol(testDF) == ncol(trainDF)) {
             harDF <- createHARDataSet(testDF, trainDF)
             harDF <- mutateActivityLabels(harDF)

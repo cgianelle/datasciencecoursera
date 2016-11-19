@@ -28,7 +28,7 @@ tidyHARData <- function(data) {
     #convert to all lower case
     colNam <- tolower(colNam)
     message("--Removing unneeded Characters from Column Names")
-    #remove the t or the f in the beginning and the () from the names
+    #remove the () from the names
     colNam <- gsub('\\(|\\)', '', colNam)
     message("--Subsetting Data Frame to Remove Columns that Don't Deal with Mean or Std")
     newData <- data[,colNum]
@@ -103,6 +103,14 @@ mutateActivityLabels <- function(harDataSet) {
                                         "LAYING"))))
 }
 
+#Take the resulting data set, order it by participant and then write the data 
+#frame out to a CSV file.
+presentToTheWorld <- function(theDataSet, fileName) {
+    sortedData <- arrange(theDataSet,
+                          as.numeric(as.character(theDataSet$Participant)))
+    write.csv(sortedData, file = fileName, row.names = FALSE)
+}
+
 run_analysis <- function() {
     cwd <- getwd()
     setwd(cwd)
@@ -116,6 +124,7 @@ run_analysis <- function() {
         if (ncol(testDF) == ncol(trainDF)) {
             harDF <- createHARDataSet(testDF, trainDF)
             harDF <- mutateActivityLabels(harDF)
+            presentToTheWorld(harDF, "initial_data_set.csv")
         } else {
             message("ERROR: The train and test data sets do not have the same number of
                     columns.")

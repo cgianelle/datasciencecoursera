@@ -14,6 +14,7 @@ YTEST_DATA_PATH <- paste(TEST_DATA_PATH,"/y_test.txt",sep = "")
 SUBJECTTEST_DATA_PATH <- paste(TEST_DATA_PATH,"/subject_test.txt",sep = "")
 
 library(dplyr)
+library(data.table)
 
 message("--Retrieve Feature Data")
 features <- read.table(UCI_HAR_FEATURES)
@@ -156,8 +157,87 @@ createParticipantAcitivitySummaryDataSet <- function(initialDataSet) {
     #   For each Activity
     #       Calculate the mean of every column
     activityColMeans <- function(activity) {
-        print(class(activity))
-        colMeans(activity)
+        DT <- data.table(activity)
+        DT[,list(tbodyacc.mean.x=mean(tbodyacc.mean.x), 
+                 tbodyacc.mean.y=mean(tbodyacc.mean.y), 
+                 tbodyacc.mean.z=mean(tbodyacc.mean.z),
+                 tbodyacc.std.x=mean(tbodyacc.std.x),
+                 tbodyacc.std.y=mean(tbodyacc.std.y),
+                 tbodyacc.std.z=mean(tbodyacc.std.z),
+                 tgravityacc.mean.x=mean(tgravityacc.mean.x),
+                 tgravityacc.mean.y=mean(tgravityacc.mean.y),
+                 tgravityacc.mean.z=mean(tgravityacc.mean.z),
+                 tgravityacc.std.x=mean(tgravityacc.std.x),
+                 tgravityacc.std.y=mean(tgravityacc.std.y),
+                 tgravityacc.std.z=mean(tgravityacc.std.z),
+                 tbodyaccjerk.mean.x=mean(tbodyaccjerk.mean.x),
+                 tbodyaccjerk.mean.y=mean(tbodyaccjerk.mean.y),
+                 tbodyaccjerk.mean.z=mean(tbodyaccjerk.mean.z),
+                 tbodyaccjerk.std.x=mean(tbodyaccjerk.std.x),
+                 tbodyaccjerk.std.y=mean(tbodyaccjerk.std.y),
+                 tbodyaccjerk.std.z=mean(tbodyaccjerk.std.z),
+                 tbodygyro.mean.x=mean(tbodygyro.mean.x),
+                 tbodygyro.mean.y=mean(tbodygyro.mean.y),
+                 tbodygyro.mean.z=mean(tbodygyro.mean.z),
+                 tbodygyro.std.x=mean(tbodygyro.std.x),
+                 tbodygyro.std.y=mean(tbodygyro.std.y),
+                 tbodygyro.std.z=mean(tbodygyro.std.z),
+                 tbodygyrojerk.mean.x=mean(tbodygyrojerk.mean.x),
+                 tbodygyrojerk.mean.y=mean(tbodygyrojerk.mean.y),
+                 tbodygyrojerk.mean.z=mean(tbodygyrojerk.mean.z),
+                 tbodygyrojerk.std.x=mean(tbodygyrojerk.std.x),
+                 tbodygyrojerk.std.y=mean(tbodygyrojerk.std.y),
+                 tbodygyrojerk.std.z=mean(tbodygyrojerk.std.z),
+                 tbodyaccmag.mean=mean(tbodyaccmag.mean),
+                 tbodyaccmag.std=mean(tbodyaccmag.std),
+                 tgravityaccmag.mean=mean(tgravityaccmag.mean),
+                 tgravityaccmag.std=mean(tgravityaccmag.std),
+                 tbodyaccjerkmag.mean=mean(tbodyaccjerkmag.mean),
+                 tbodyaccjerkmag.std=mean(tbodyaccjerkmag.std),
+                 tbodygyromag.mean=mean(tbodygyromag.mean),
+                 tbodygyromag.std=mean(tbodygyromag.std),
+                 tbodygyrojerkmag.mean=mean(tbodygyrojerkmag.mean),
+                 tbodygyrojerkmag.std=mean(tbodygyrojerkmag.std),
+                 fbodyacc.mean.x=mean(fbodyacc.mean.x),
+                 fbodyacc.mean.y=mean(fbodyacc.mean.y),
+                 fbodyacc.mean.z=mean(fbodyacc.mean.z),
+                 fbodyacc.std.x=mean(fbodyacc.std.x),
+                 fbodyacc.std.y=mean(fbodyacc.std.y),
+                 fbodyacc.std.z=mean(fbodyacc.std.z),
+                 fbodyacc.meanfreq.x=mean(fbodyacc.meanfreq.x),
+                 fbodyacc.meanfreq.y=mean(fbodyacc.meanfreq.y),
+                 fbodyacc.meanfreq.z=mean(fbodyacc.meanfreq.z),
+                 fbodyaccjerk.mean.x=mean(fbodyaccjerk.mean.x),
+                 fbodyaccjerk.mean.y=mean(fbodyaccjerk.mean.y),
+                 fbodyaccjerk.mean.z=mean(fbodyaccjerk.mean.z),
+                 fbodyaccjerk.std.x=mean(fbodyaccjerk.std.x),
+                 fbodyaccjerk.std.y=mean(fbodyaccjerk.std.y),
+                 fbodyaccjerk.std.z=mean(fbodyaccjerk.std.z),
+                 fbodyaccjerk.meanfreq.x=mean(fbodyaccjerk.meanfreq.x),
+                 fbodyaccjerk.meanfreq.y=mean(fbodyaccjerk.meanfreq.y),
+                 fbodyaccjerk.meanfreq.z=mean(fbodyaccjerk.meanfreq.z),
+                 fbodygyro.mean.x=mean(fbodygyro.mean.x),
+                 fbodygyro.mean.y=mean(fbodygyro.mean.y),
+                 fbodygyro.mean.z=mean(fbodygyro.mean.z),
+                 fbodygyro.std.x=mean(fbodygyro.std.x),
+                 fbodygyro.std.y=mean(fbodygyro.std.y),
+                 fbodygyro.std.z=mean(fbodygyro.std.z),
+                 fbodygyro.meanfreq.x=mean(fbodygyro.meanfreq.x),
+                 fbodygyro.meanfreq.y=mean(fbodygyro.meanfreq.y),
+                 fbodygyro.meanfreq.z=mean(fbodygyro.meanfreq.z),
+                 fbodyaccmag.mean=mean(fbodyaccmag.mean),
+                 fbodyaccmag.std=mean(fbodyaccmag.std),
+                 fbodyaccmag.meanfreq=mean(fbodyaccmag.meanfreq),
+                 fbodybodyaccjerkmag.mean=mean(fbodybodyaccjerkmag.mean),
+                 fbodybodyaccjerkmag.std=mean(fbodybodyaccjerkmag.std),
+                 fbodybodyaccjerkmag.meanfreq=mean(fbodybodyaccjerkmag.meanfreq),
+                 fbodybodygyromag.mean=mean(fbodybodygyromag.mean),
+                 fbodybodygyromag.std=mean(fbodybodygyromag.std),
+                 fbodybodygyromag.meanfreq=mean(fbodybodygyromag.meanfreq),
+                 fbodybodygyrojerkmag.mean=mean(fbodybodygyrojerkmag.mean),
+                 fbodybodygyrojerkmag.std=mean(fbodybodygyrojerkmag.std),
+                 fbodybodygyrojerkmag.meanfreq=mean(fbodybodygyrojerkmag.meanfreq)),
+           by=c("Participant", "Activity")]
     }
     
     splitActivity <- function(participant) {
@@ -165,8 +245,15 @@ createParticipantAcitivitySummaryDataSet <- function(initialDataSet) {
         lapply(activities, activityColMeans)
     }
     participants <- split.data.frame(initialDataSet, initialDataSet$Participant)
-    lapply(participants, splitActivity)
+    a <- lapply(participants, splitActivity)
     
+    newDF <- data.frame()
+    for (participant in 1:30) {
+        for (activity in 1:6) {
+            newDF <- bind_rows(newDF, a[[participant]][[activity]])
+        }
+    }
+    return(newDF)
 }
 
 
@@ -178,7 +265,8 @@ run_analysis <- function() {
         message("UCI HAR Analysis v1.1.0")
         harDF <- createInitialDataSet()
         presentToTheWorld(harDF, "initial_data_set.csv")
-        
+        summaryDF <- createParticipantAcitivitySummaryDataSet(harDF)
+        presentToTheWorld(summaryDF, "summary_data_set.csv")
         #Create the train and test data frames so that we can merge them into 1
     } else {
         message("Unable to locate UCI_HAR_Dataset. See README.md for separate 

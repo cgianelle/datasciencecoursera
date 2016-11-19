@@ -34,9 +34,9 @@ colNam <- gsub('\\(|\\)', '', colNam)
 # Then taking that information, subsets the data to contain only those indicies 
 # and then renames the columns to the tidied version produced here.
 tidyHARData <- function(data) {
-    message("--Subsetting Data Frame to Remove Columns that Don't Deal with Mean or Std")
+    message("----Subsetting Data Frame to Remove Columns that Don't Deal with Mean or Std")
     newData <- data[,colNum]
-    message("--Applying New Column Names")
+    message("----Applying New Column Names")
     names(newData) <-colNam
     return(newData)
 }
@@ -65,7 +65,7 @@ createDataSet <- function(x_data_path, y_data_path, subject_data_path) {
 #Take the subject_train.txt, X_train.txt, and the y_train.txt and create a 
 #single data frame representing the training data
 createTrainingDataSet <- function() {
-    message("-Creating Data Frame from Training Data")
+    message("--Creating Data Frame from Training Data")
     return(createDataSet(XTRAIN_DATA_PATH, 
                          YTRAIN_DATA_PATH, 
                          SUBJECTTRAIN_DATA_PATH))
@@ -74,7 +74,7 @@ createTrainingDataSet <- function() {
 #Take the subject_test.txt, X_test.txt, and the y_test.txt and create a 
 #single data frame representing the test data
 createTestDataSet <- function() {
-    message("-Creating Data Frame from Test Data")
+    message("--Creating Data Frame from Test Data")
     return(createDataSet(XTEST_DATA_PATH, 
                          YTEST_DATA_PATH, 
                          SUBJECTTEST_DATA_PATH))
@@ -83,7 +83,7 @@ createTestDataSet <- function() {
 #Bind the test and the training data frames into one
 #
 createHARDataSet <- function(test, train) {
-    message("-Combining test and training data frames into one")
+    message("--Combining test and training data frames into one")
     return(bind_rows(test, train))
 }
 
@@ -96,7 +96,7 @@ createHARDataSet <- function(test, train) {
 # 6 LAYING
 #This will change the numeric values to their string equivalents
 mutateActivityLabels <- function(harDataSet) {
-    message("-Applying Activity Labels to Activity Column")
+    message("--Applying Activity Labels to Activity Column")
     al <- read.table(UCI_HAR_ACTIVITY_LABELS)
     return(mutate(harDataSet, 
                   Activity = factor(Activity, 
@@ -106,31 +106,84 @@ mutateActivityLabels <- function(harDataSet) {
 #Take the resulting data set, order it by participant and then write the data 
 #frame out to a CSV file.
 presentToTheWorld <- function(theDataSet, fileName) {
-    message(paste("-Creating CSV file", fileName))
-    sortedData <- arrange(theDataSet,
-                          as.numeric(as.character(theDataSet$Participant)))
-    write.csv(sortedData, file = fileName, row.names = FALSE)
+    message(paste("--Creating CSV file", fileName))
+    write.csv(theDataSet, file = fileName, row.names = FALSE)
 }
+
+#Processes the HAR data files and produces a single data set that covers both 
+#the test and training data as it pertains to anything related to mean or std.
+createInitialDataSet <- function() {
+    message("-Creating the Initial Data Set")
+    testDF <- createTestDataSet()
+    trainDF <- createTrainingDataSet()
+    
+    #Do the column widths of the data frames match?
+    if (ncol(testDF) == ncol(trainDF)) {
+        harDF <- createHARDataSet(testDF, trainDF)
+        harDF <- mutateActivityLabels(harDF)
+        harDF <- arrange(harDF,
+                              as.numeric(as.character(harDF$Participant)),
+                              as.character(harDF$Activity))
+        
+    } else {
+        message("ERROR: The train and test data sets do not have the same number of
+                columns.")
+    }
+}
+
+#Using the initial data set, create a new data set that calculates the mean of 
+#each variable per acticity for the user. So instead of 
+#Participant   Activity   Variable X .....
+#    1         WALKING       #
+#    1         WALKING       #
+#    1         WALKING       #
+#    1         STANDING      #
+#    1         STANDING      #
+#    1         STANDING      #
+#          ....
+#    2         LAYING        #
+#    2         LAYING        #
+#    2         LAYING        #
+#    2         STANDING      #
+#    2         STANDING      #
+#          ....
+#Create this
+#Participant   Activity   Variable X .....
+#    1         WALKING       mean of X
+#    1         STANDING      mean of X
+#          ....
+#    2         LAYING        mean of X
+#    2         STANDING      mean of X
+#          ....
+createParticipantAcitivitySummaryDataSet <- function(initialDataSet) {
+    #For each participant
+    #   For each Activity
+    #       Calculate the mean of every column
+    activityColMeans <- function(activity) {
+        print(class(activity))
+        colMeans(activity)
+    }
+    
+    splitActivity <- function(participant) {
+        activities <- split.data.frame(participant, participant$Activity)
+        lapply(activities, activityColMeans)
+    }
+    participants <- split.data.frame(initialDataSet, initialDataSet$Participant)
+    lapply(participants, splitActivity)
+    
+}
+
 
 run_analysis <- function() {
     cwd <- getwd()
     setwd(cwd)
     
     if (file.exists(UCI_HAR_DATASET_PATH)) {
-        message("UCI HAR Analysis v1.0.0")
-        #Create the train and test data frames so that we can merge them into 1
-        testDF <- createTestDataSet()
-        trainDF <- createTrainingDataSet()
+        message("UCI HAR Analysis v1.1.0")
+        harDF <- createInitialDataSet()
+        presentToTheWorld(harDF, "initial_data_set.csv")
         
-        #Do the column widths of the data frames match?
-        if (ncol(testDF) == ncol(trainDF)) {
-            harDF <- createHARDataSet(testDF, trainDF)
-            harDF <- mutateActivityLabels(harDF)
-            presentToTheWorld(harDF, "initial_data_set.csv")
-        } else {
-            message("ERROR: The train and test data sets do not have the same number of
-                    columns.")
-        }
+        #Create the train and test data frames so that we can merge them into 1
     } else {
         message("Unable to locate UCI_HAR_Dataset. See README.md for separate 
                 instructions for downloading and configuring dataset")

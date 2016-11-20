@@ -13,7 +13,17 @@ Before I jump in and describe the work that I did to produce my results, let me 
    * Platform: x86_64-apple-darwin13.4.0 (64-bit)
 
 ## The Data
-The "data" is a database built from the recordings of 30 subjects performing activities of daily living (ADL) while carrying a waist-mounted smartphone (Samsung Galaxy S2) with embedded inertial sensors (accelerometer and gyroscope). These subjects were divided into two classifications: test and training. 30% of participants were selected to participate in the _test_ group and the other 70% were choosen for the _training_ group (so, 9 and 21   respectively).
+The data is a database built from the recordings of 30 subjects performing activities of daily living (ADL) while carrying a waist-mounted smartphone (Samsung Galaxy S2) with embedded inertial sensors (accelerometer and gyroscope). These subjects were divided into two classifications: test and training. 30% of participants were selected to participate in the _test_ group and the other 70% were choosen for the _training_ group (so, 9 and 21 respectively). The "activities of daily living" that were performed are as follows:
+ 1. Walking
+ 2. Walking Upstairs
+ 3. Walking Downstairs
+ 4. Sitting
+ 5. Standing
+ 6. Laying
+ 
+The signals from the accelerometer and gyroscope were processed by applying noise filters and sampled over sliding windows of 2.56 sec with 50% overlap (128 readings/window). The sensor acceleration signal was separated using a Butterworth low-pass filter into two components: body acceleration and gravity. The gravitational force was assumed to have only low frequency components, so a filter with 0.3 Hz cutoff frequency was used. From the sampling windows, a vector of features (see the [CodeBook](CodeBook.md)) was obtained by calculating the variables from the time and frequency domain. See 'UCI_HAR_Dataset/features_info.txt' for more details. 
+ 
+For the purposes of this project, only the mean and standard deviation (std) were of interest.
 
 ### Getting the Data
 From the Mac terminal I ran the following commands to pull the dataset:
@@ -52,18 +62,19 @@ The following files are available for the train and test data. Their description
 ~~~~
 > source('run_analysis.R')
 --Retrieve Feature Data
---Search for Column Names that have Mean or Std in them
 --Removing unneeded Characters from Column Names
+--Search for Column Names that have Mean or Std in them
 > run_analysis()
-UCI HAR Analysis v1.0.0
--Creating Data Frame from Test Data
---Subsetting Data Frame to Remove Columns that Don't Deal with Mean or Std
---Applying New Column Names
--Creating Data Frame from Training Data
---Subsetting Data Frame to Remove Columns that Don't Deal with Mean or Std
---Applying New Column Names
--Combining test and training data frames into one
--Applying Activity Labels to Activity Column
--Creating CSV file initial_data_set.csv
+UCI HAR Analysis v1.1.0
+-Creating the Initial Data Set
+--Creating Data Frame from Test Data
+----Subsetting Data Frame to Remove Columns that Don't Deal with Mean or Std
+--Creating Data Frame from Training Data
+----Subsetting Data Frame to Remove Columns that Don't Deal with Mean or Std
+--Combining Test and Training Data Frames into One
+--Applying Activity Labels to Activity Column
+--Creating CSV file initial_data_set.csv
+-Collapsing Initial Data Frame by Participant and Activity
+--Creating CSV file summary_data_set.csv
 ~~~~
 

@@ -173,3 +173,13 @@ UCI HAR Analysis v1.1.0
 --Creating CSV file summary_data_set.csv
 ~~~~
 
+## About run_analysis.R
+The main driver of the script is the function *run_analysis()*. This creates the initial data set (*createInitialDataSet()*) and summary data set (*createParticipantAcitivitySummaryDataSet(initialDataSet)*). 
+
+Other functions of interest:
+ * _createTrainingDataSet_ - Creates a data frame from the training data.
+ * _createTestDataSet_ - Creates a data frame from the test data.
+ * _createDataSet_ - This is the work horse to create the data frames referenced in the two function listed above. Takes the paths to the X_, y_, and subject_ files referenced in the test/ and train/ folders.
+ * _tidyHARData_ - This function subsets the columns in the data frame to remove those columns that don't relate to mean and standard deviation.
+ * _mutateActivityLabels_ - This applies the activity factor to the Activity column to change the numeric values of activities to their human readable forms.
+

@@ -274,6 +274,7 @@ run_analysis <- function() {
         presentToTheWorld(harDF, "initial_data_set.csv")
         summaryDF <- createParticipantAcitivitySummaryDataSet(harDF)
         presentToTheWorld(summaryDF, "summary_data_set.csv")
+        write.table(summaryDF, file = "summary_data_table.txt", row.names = FALSE)
         #Create the train and test data frames so that we can merge them into 1
     } else {
         message("Unable to locate UCI_HAR_Dataset. See README.md for separate 

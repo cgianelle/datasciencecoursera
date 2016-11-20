@@ -80,7 +80,7 @@ createTestDataSet <- function() {
 #Bind the test and the training data frames into one
 #
 createHARDataSet <- function(test, train) {
-    message("--Combining test and training data frames into one")
+    message("--Combining Test and Training Data Frames into One")
     return(bind_rows(test, train))
 }
 
@@ -245,8 +245,15 @@ createParticipantAcitivitySummaryDataSet <- function(initialDataSet) {
         lapply(activities, activityColMeans)
     }
     participants <- split.data.frame(initialDataSet, initialDataSet$Participant)
+    message("-Collapsing Initial Data Frame by Participant and Activity")
     a <- lapply(participants, splitActivity)
     
+    # 'a' is a list of data frames that is broken down by 1) participants and 
+    #then 2) by activity
+    
+    #Stich the list of frames back into a single data frame, newDF
+    # We know from the HAR data that there are 30 participants and 6 Activity 
+    # types
     newDF <- data.frame()
     for (participant in 1:30) {
         for (activity in 1:6) {
